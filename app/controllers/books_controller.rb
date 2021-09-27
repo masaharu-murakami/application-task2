@@ -4,6 +4,8 @@ class BooksController < ApplicationController
     @book = Book.find(params[:id])
     @books = Book.new
     @user = @book.user
+    
+    @book_comment = BookComment.new　#コメント機能,応用課題2-3
   end
 
   def index
@@ -24,6 +26,11 @@ class BooksController < ApplicationController
 
   def edit
     @book = Book.find(params[:id])
+    if @book.user_id == current_user.id
+      render 'edit'
+    else
+      redirect_to books_path
+    end
   end
 
 
@@ -46,7 +53,14 @@ class BooksController < ApplicationController
   private
 
   def book_params
-    params.require(:book).permit(:title,:body)
+    params.require(:book).permit(:title, :body)
+  end
+
+  def ensure_correct_user
+     @book = Book.find(params[:id])
+      unless @book.user == current_user
+        redirect_to books_path
+      end
   end
 
 end
